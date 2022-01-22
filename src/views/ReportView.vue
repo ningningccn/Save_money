@@ -1,14 +1,15 @@
 <template>
-  <!-- <BarChart /> -->
-  <div>123</div>
+  <div>
+    <BarChart />
+  </div>
 </template>
 
 <script>
-// import BarChart from '../components/BarChart.vue'
-
+// import {reactive} from 'vue'
+import BarChart from '../components/BarChart.vue'
 export default {
   components: {
-    // BarChart
+    BarChart
   }
 }
 </script>

@@ -191,9 +191,7 @@ export default{
       }
     })
 
-    onMounted(() => {
-      update()
-    })
+    onMounted(() => update())
     return {
       toDay,
       pay,income,balances,
