@@ -4,12 +4,16 @@
       <div class="head-l w-25 text-start mt-2">
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
         <div class="date">{{ toDay }}</div>
+        <!-- <datepicker v-model="picked" /> -->
       </div>
       <div class="head-r w-50 text-end">
         <div>總收入 : <span class="text-success">${{ income }}</span></div>
         <div>總支出 : <span class="text-danger">${{ pay }}</span></div>
         <div>餘額 : <span>${{ balances }}</span></div>
       </div>
+    </div>
+    <div>
+      <DatePicker v-model="toDayTest" is-expanded />
     </div>
     <div class="d-flex justify-content-around">
       <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#incomeModal">收入</button>
@@ -116,9 +120,15 @@
 </template>
 <script>
 import { ref, reactive, onMounted, computed } from "vue"
+// import Datepicker from 'vue3-datepicker'
+// import { Calendar } from 'v-calendar';
+import {  DatePicker } from 'v-calendar';
 export default{
+  components: {DatePicker },
   setup(){
-    // 總數
+// 總數
+    const picked = ref(new Date())
+    const toDayTest = ref(new Date());
     const income = ref(0);
     const pay = ref(0);
     const balances = ref(0);
@@ -203,6 +213,7 @@ export default{
       moneyData,
       update,
       dataReverse,
+      picked,toDayTest
     }
   }
 }

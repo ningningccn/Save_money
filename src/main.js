@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap-icons/font/bootstrap-icons.css"
 import "bootstrap"
 import VueGoogleCharts from 'vue3-googl-chart'
+import VCalendar from 'v-calendar';
 
-createApp(App).use(router).use(VueGoogleCharts).mount('#app')
+createApp(App).use(router).use(VCalendar, {}).use(VueGoogleCharts).mount('#app')
 
