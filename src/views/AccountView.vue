@@ -61,7 +61,7 @@
               <h5 class="modal-title" id="exampleModalLabel">支出</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form @submit="addPay">
+            <form @submit.prevent="addPay">
               <span>日期: </span><input type="date" class="w-75 my-2" v-model="payData.date">
               <div>
                 <span>種類: </span>
@@ -105,7 +105,8 @@
         <tbody>
           <tr v-for="(item, index) in dataReverse" :key="item">
             <th scope="row">{{ index+1 }}</th>
-            <td>{{ item.date }}</td>
+            <!-- <td>{{ item.date }}</td> -->
+            <td></td>
             <td>{{ item.category }}</td>
             <td>{{ item.money }}</td>
             <td>{{ item.remark }}</td>
@@ -118,12 +119,17 @@
   </div>
 </template>
 <script>
-import { ref, reactive, onMounted, computed } from "vue"
+import { ref, reactive, onMounted, computed ,watch} from "vue"
 import {  DatePicker } from 'v-calendar';
 export default{
   components: {DatePicker },
   setup(){
 // 總數
+    const selectedDate = reactive({
+      year:0,
+      month:0,
+      day:0
+    })
     const toDayTest = ref(new Date());
     const income = ref(0);
     const pay = ref(0);
@@ -168,6 +174,7 @@ export default{
         return
       }
       if(!localStorage.getItem('data')){
+        // payData.date.year = payData.date.toDayString.substr(0,4)
         tempData.value.push(payData);
         console.log('tempData: 158', tempData);
         localStorage.setItem('data', JSON.stringify(tempData.value));
@@ -176,7 +183,9 @@ export default{
         update();
       }else{
         const temp = JSON.parse(localStorage.getItem('data'));
-        console.log(temp , 'else的temp')
+        // console.log(temp , 'else的temp')
+        // payData.year = payData.date.substr(0,4)
+        // console.log(typeof(payData.date))
         temp.push(payData);
         localStorage.setItem('data', JSON.stringify(temp));
         console.log(localStorage.getItem('data'));
@@ -188,7 +197,8 @@ export default{
     function deleteData(index) {
       const temp = JSON.parse(localStorage.getItem('data'));
       console.log( temp , index)
-      temp.splice(index);
+      temp.splice(index,1);
+      console.log(temp);
       localStorage.setItem('data', JSON.stringify(temp));
       update();
     }
@@ -203,7 +213,11 @@ export default{
         return [];
       }
     })
-
+    watch(toDayTest,() => {
+      selectedDate.year = toDayTest.value.getFullYear()
+      selectedDate.month = toDayTest.value.getMonth()
+      selectedDate.day = toDayTest.value.getDate()
+    }),
     onMounted(() => update())
     return {
       toDay,
@@ -217,7 +231,8 @@ export default{
       update,
       toDayTest,
       dataReverse,
-      deleteData
+      deleteData,
+      selectedDate
     }
   }
 }
