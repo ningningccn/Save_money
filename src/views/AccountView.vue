@@ -4,7 +4,6 @@
       <div class="head-l w-25 text-start mt-2">
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
         <div class="date">{{ toDay }}</div>
-        <!-- <datepicker v-model="picked" /> -->
       </div>
       <div class="head-r w-50 text-end">
         <div>總收入 : <span class="text-success">${{ income }}</span></div>
@@ -13,7 +12,7 @@
       </div>
     </div>
     <div>
-      <DatePicker v-model="toDayTest" is-expanded />
+      <DatePicker is-expanded v-model="toDayTest" mode="date"/>
     </div>
     <div class="d-flex justify-content-around">
       <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#incomeModal">收入</button>
@@ -110,7 +109,7 @@
             <td>{{ item.category }}</td>
             <td>{{ item.money }}</td>
             <td>{{ item.remark }}</td>
-            <td><button type="button" class="btn-close "></button></td>
+            <td><button type="button" class="btn-close" @click="deleteData(index)"></button></td>
           </tr>
         </tbody>
       </table>
@@ -120,14 +119,11 @@
 </template>
 <script>
 import { ref, reactive, onMounted, computed } from "vue"
-// import Datepicker from 'vue3-datepicker'
-// import { Calendar } from 'v-calendar';
 import {  DatePicker } from 'v-calendar';
 export default{
   components: {DatePicker },
   setup(){
 // 總數
-    const picked = ref(new Date())
     const toDayTest = ref(new Date());
     const income = ref(0);
     const pay = ref(0);
@@ -189,6 +185,13 @@ export default{
       }
     }
     // 更新畫面
+    function deleteData(index) {
+      const temp = JSON.parse(localStorage.getItem('data'));
+      console.log( temp , index)
+      temp.splice(index);
+      localStorage.setItem('data', JSON.stringify(temp));
+      update();
+    }
     function update() {
       moneyData.value= JSON.parse(localStorage.getItem('data'));
     }
@@ -212,8 +215,9 @@ export default{
       addPay,
       moneyData,
       update,
+      toDayTest,
       dataReverse,
-      picked,toDayTest
+      deleteData
     }
   }
 }
