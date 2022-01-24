@@ -12,7 +12,8 @@
       </div>
     </div>
     <div>
-      <DatePicker is-expanded v-model="toDayTest" mode="date"/>
+      <DatePicker is-expanded v-model="datePick"
+        :attributes="attributes"/>
     </div>
     <div class="d-flex justify-content-around">
       <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#incomeModal">收入</button>
@@ -27,11 +28,11 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form @submit="addIncome">
-                <span>日期: </span><input type="date" class="w-75 my-2" v-model="incomeData.date">
+              <form @submit.prevent="addIncome">
+                <span>日期: </span><input type="date" class="w-75 my-2" v-model="incomeRecords.date">
                 <div>
                   <span>種類: </span>
-                  <select class="w-75 my-2" v-model="incomeData.category">
+                  <select class="w-75 my-2" v-model="incomeRecords.category">
                     <option value="salary">工資</option>
                     <option value="bonus">獎金</option>
                     <option value="investment">理財投資</option>
@@ -39,10 +40,10 @@
                   </select>
                 </div>
                 <div>
-                  <span>金額: </span><input type="number" class="w-75 my-2" v-model="incomeData.money">
+                  <span>金額: </span><input type="number" class="w-75 my-2" v-model="incomeRecords.money">
                 </div>
                 <div>
-                  <span>備註: </span><input type="text" class="w-75 my-2" v-model="incomeData.remark">
+                  <span>備註: </span><input type="text" class="w-75 my-2" v-model="incomeRecords.remark">
                 </div>
                 <div class="d-flex justify-content-end pe-5 py-5">
                   <button type="button" class="btn btn-secondary me-5" data-bs-dismiss="modal">Close</button>
@@ -62,10 +63,10 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form @submit.prevent="addPay">
-              <span>日期: </span><input type="date" class="w-75 my-2" v-model="payData.date">
+              <span>日期: </span><input type="date" class="w-75 my-2" v-model="payRecords.date">
               <div>
                 <span>種類: </span>
-                <select class="w-75 my-2" v-model="payData.category">
+                <select class="w-75 my-2" v-model="payRecords.category">
                   <option value="salary">工資</option>
                   <option value="bonus">獎金</option>
                   <option value="investment">理財投資</option>
@@ -73,13 +74,13 @@
                 </select>
               </div>
               <div>
-                <span>金額: </span><input type="number" class="w-75 my-2" v-model.number="payData.money">
+                <span>金額: </span><input type="number" class="w-75 my-2" v-model.number="payRecords.money">
               </div>
               <div>
-                <span>備註: </span><input type="text" class="w-75 my-2" v-model="payData.remark">
+                <span>備註: </span><input type="text" class="w-75 my-2" v-model="payRecords.remark">
               </div>
               <div class="d-flex justify-content-end pe-5 py-5">
-                {{ payData.money }} {{ payData.today}}
+                {{ payRecords.money }} {{ payRecords.today}}
                 <button type="button" class="btn btn-secondary me-5" data-bs-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary">Save</button>
               </div>
@@ -94,27 +95,24 @@
       <table class="table table-hover">
         <thead>
           <tr>
-            <th scope="col"></th>
             <th scope="col">時間</th>
             <th scope="col">分類</th>
             <th scope="col">金額</th>
-            <th colspan="2">備註</th>
-            <!-- <th scope="col"></th> -->
+            <!-- <th colspan="2">備註</th> -->
+            <th scope="col">備註</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item, index) in dataReverse" :key="item">
-            <th scope="row">{{ index+1 }}</th>
+          <tr v-for="(item) in dataReverse" :key="item.id">
             <td>{{ item.date }}</td>
-            <td></td>
             <td>{{ item.category }}</td>
             <td>{{ item.money }}</td>
             <td>{{ item.remark }}</td>
-            <td><button type="button" class="btn-close" @click="deleteData(index)"></button></td>
+            <td><button type="button" class="btn-close" @click="deleteData(item)"></button></td>
           </tr>
         </tbody>
       </table>
-      <div class="text-center p-5" v-if="!moneyData">沒有資料</div>
+      <div class="text-center p-5" v-if="!startData || startData==undefined">沒有資料</div>
     </div>
   </div>
 </template>
@@ -122,131 +120,154 @@
 import { ref, reactive, onMounted, computed ,watch} from "vue"
 import {  DatePicker } from 'v-calendar';
 export default{
-  components: {DatePicker },
+  components: { DatePicker },
   setup(){
 // 總數
-    const selectedDate = reactive({
-      fullDay:'',
-      year:0,
-      month:0,
-      day:0
-    })
-    const toDayTest = ref(new Date());
     const income = ref(0);
     const pay = ref(0);
     const balances = ref(0);
-    const toDay = new Date().toISOString().slice(0,10)
-    const tempData = ref([]); //
-    const moneyData = ref([]); // 啟動時資料會存在這
+    const attributes = reactive(
+      [
+        {
+          dot: 'red',
+          dates: [] // dates:[new Date(2022, 0, 10),new Date(2022, 0, 15),new Date(2022, 0, 20)]
+        }
+      ]);
+    const selectedDate = ref('')
+    const datePick = ref(new Date(+new Date() + 8 * 3600 * 1000));
+    // const toDay = new Date().toISOString().slice(0,10)
+    const toDay = new Date(+new Date() + 8 * 3600 * 1000).toISOString().substr(0,10)
+    // const tempData = ref([]); //
+    const startData = ref([]); // 啟動時資料會存在這
     const moneyDataShow = ref([]);
+    const dotShowArr = reactive([]);
     // 收入
-    const incomeData = reactive({
+    const incomeRecords = reactive({
+      id: Date.now(),
       date: toDay,
       category: '',
       money: 0,
       remark: '',
     });
     function addIncome() {
-      if(incomeData.money <=0){
+      if(incomeRecords.money <=0){
         alert('請輸入正確金額');
         return
       }
       if(!localStorage.getItem('data')){
-        tempData.value.push(incomeData)
-        localStorage.setItem('data', JSON.stringify(tempData.value))
-        tempData.value = [];
-        update()
+        const tempArr  = [];
+        tempArr.push(incomeRecords)
+        localStorage.setItem('data', JSON.stringify(tempArr))
+        getLocalStorageData()
       }else{
-        const temp = JSON.parse(localStorage.getItem('data'));
-        temp.push(incomeData);
-        localStorage.setItem('data', JSON.stringify(temp));
-        update();
+        const tempStr  = JSON.parse(localStorage.getItem('data'));
+        tempStr.push(incomeRecords);
+        localStorage.setItem('data', JSON.stringify(tempStr));
+        getLocalStorageData();
       }
     }
-    // 支出
-    const payData = reactive({
+    // !------------------------------支出
+    const payRecords = reactive({
+      id: Date.now(),
       date: toDay,
       category: '',
       money: 0,
       remark: '',
     });
     function addPay() {
-      if(payData.money <=0){
+      if(payRecords.money <=0){
         alert('請輸入正確金額');
-        return
+        return;
       }
       if(!localStorage.getItem('data')){
-        // payData.date.year = payData.date.toDayString.substr(0,4)
-        tempData.value.push(payData);
-        console.log('tempData: 158', tempData);
-        localStorage.setItem('data', JSON.stringify(tempData.value));
-        tempData.value = []; //清空陣列
-        console.log('111111')
-        update();
+        const tempArr = []
+        tempArr.push(payRecords);
+        console.log('tempData: 158', tempArr);
+        localStorage.setItem('data', JSON.stringify(tempArr));
+        getLocalStorageData();
       }else{
-        const temp = JSON.parse(localStorage.getItem('data'));
-        // console.log(temp , 'else的temp')
-        // payData.year = payData.date.substr(0,4)
-        // console.log(typeof(payData.date))
-        temp.push(payData);
-        localStorage.setItem('data', JSON.stringify(temp));
-        console.log(localStorage.getItem('data'));
-        console.log('2222222')
-        update();
+        const tempArr = JSON.parse(localStorage.getItem('data'));
+        tempArr.push(payRecords);
+        localStorage.setItem('data', JSON.stringify(tempArr));
+        // console.log(localStorage.getItem('data'));
+        // console.log('2222222')
+        getLocalStorageData()
       }
     }
-    function deleteData(index) {
+    function deleteData(item) {
+      console.log(item.id);
       const temp = JSON.parse(localStorage.getItem('data'));
-      console.log( temp , index)
-      temp.splice(index,1);
+      console.log(temp);
+      temp.splice(temp.indexOf(item.id),1);
       console.log(temp);
       localStorage.setItem('data', JSON.stringify(temp));
-      update();
+      getLocalStorageData();
+      console.log(startData.value)
     }
+    //================================================================
       // 更新畫面
-    function update() {
-      moneyData.value= JSON.parse(localStorage.getItem('data'));
+    function getLocalStorageData() {
+      console.log(1);
+      startData.value = JSON.parse(localStorage.getItem('data'));
+      dotShow(); //顯示紅點
+    }
+    function dotShow() {
+      // const tempArr = []
+      // moneyData.value.forEach((item) => {
+      //   tempArr.includes(item.date)? '' : tempArr.push(item.date)
+      // })
+      // const a = [];
+      // tempArr.forEach((item ) => {
+      //   a.push(item.replace(/-/g,','))
+      // })
+      // a.forEach((item) => {
+      //   attributes[0].dates.push(new Date(item))
+      // })
     }
     //顯示倒轉
     const dataReverse = computed(() => {
-      if(moneyDataShow.value.length !=0) {
+      if(moneyDataShow.value.length> 0) {
         return  moneyDataShow.value.slice(0).reverse()
       }
-      else if(moneyData.value){
-        return moneyData.value.filter(item => item.date == toDay)
+      else if(selectedDate.value){
+        return moneyDataShow.value.slice(0).reverse()
+      }
+      else if(startData.value){
+        return startData.value.filter(item => item.date == toDay)
       }else {
         return [];
       }
     })
     // const testShowData = computed(() => {
     // })
-    watch(toDayTest,() => {
-      // selectedDate.year = toDayTest.value.getFullYear()
-      // selectedDate.month = toDayTest.value.getMonth()+1
-      // selectedDate.day = toDayTest.value.getDate()
-      if(toDayTest.value != null){
-        selectedDate.fullDay = toDayTest.value.toISOString().slice(0,10);
+    watch(datePick,() => {
+      if(datePick.value != null){
+        selectedDate.value = datePick.value.toISOString().slice(0,10);
+        // console.log(selectedDate.value)
       }
-      moneyDataShow.value = moneyData.value.filter(item => item.date == selectedDate.fullDay)
-      // console.log('moneyData: ', moneyDateShow.value);
-      // console.log('a: ', a);
+      if(startData.value){
+        moneyDataShow.value = startData.value.filter(item => item.date == selectedDate.value)
+      }
     }),
-    onMounted(() => update())
+    onMounted(() => getLocalStorageData())
+    onMounted(() => dotShow())
     return {
-      toDay,
       pay,income,balances,
-      tempData,
-      incomeData,
+      toDay,
+      incomeRecords,
       addIncome,
-      payData,
+      payRecords,
       addPay,
-      moneyData,
+      startData,
       moneyDataShow,
-      update,
-      toDayTest,
+      getLocalStorageData,
+      datePick,
       dataReverse,
       deleteData,
-      selectedDate
+      selectedDate,
+      attributes,
+      dotShow,
+      dotShowArr
     }
   }
 }
