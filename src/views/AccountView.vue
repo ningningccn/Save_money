@@ -105,7 +105,7 @@
         <tbody>
           <tr v-for="(item, index) in dataReverse" :key="item">
             <th scope="row">{{ index+1 }}</th>
-            <!-- <td>{{ item.date }}</td> -->
+            <td>{{ item.date }}</td>
             <td></td>
             <td>{{ item.category }}</td>
             <td>{{ item.money }}</td>
@@ -126,6 +126,7 @@ export default{
   setup(){
 // 總數
     const selectedDate = reactive({
+      fullDay:'',
       year:0,
       month:0,
       day:0
@@ -137,6 +138,7 @@ export default{
     const toDay = new Date().toISOString().slice(0,10)
     const tempData = ref([]); //
     const moneyData = ref([]); // 啟動時資料會存在這
+    const moneyDataShow = ref([]);
     // 收入
     const incomeData = reactive({
       date: toDay,
@@ -193,7 +195,6 @@ export default{
         update();
       }
     }
-    // 更新畫面
     function deleteData(index) {
       const temp = JSON.parse(localStorage.getItem('data'));
       console.log( temp , index)
@@ -202,21 +203,33 @@ export default{
       localStorage.setItem('data', JSON.stringify(temp));
       update();
     }
+      // 更新畫面
     function update() {
       moneyData.value= JSON.parse(localStorage.getItem('data'));
     }
     //顯示倒轉
     const dataReverse = computed(() => {
-      if(moneyData.value != null) {
-        return  moneyData.value.slice(0).reverse()
+      if(moneyDataShow.value.length !=0) {
+        return  moneyDataShow.value.slice(0).reverse()
+      }
+      else if(moneyData.value){
+        return moneyData.value.filter(item => item.date == toDay)
       }else {
         return [];
       }
     })
+    // const testShowData = computed(() => {
+    // })
     watch(toDayTest,() => {
-      selectedDate.year = toDayTest.value.getFullYear()
-      selectedDate.month = toDayTest.value.getMonth()
-      selectedDate.day = toDayTest.value.getDate()
+      // selectedDate.year = toDayTest.value.getFullYear()
+      // selectedDate.month = toDayTest.value.getMonth()+1
+      // selectedDate.day = toDayTest.value.getDate()
+      if(toDayTest.value != null){
+        selectedDate.fullDay = toDayTest.value.toISOString().slice(0,10);
+      }
+      moneyDataShow.value = moneyData.value.filter(item => item.date == selectedDate.fullDay)
+      // console.log('moneyData: ', moneyDateShow.value);
+      // console.log('a: ', a);
     }),
     onMounted(() => update())
     return {
@@ -228,6 +241,7 @@ export default{
       payData,
       addPay,
       moneyData,
+      moneyDataShow,
       update,
       toDayTest,
       dataReverse,
