@@ -12,7 +12,7 @@
         <div>餘額 : <span>${{ balances }}</span></div>
       </div>
     </div>
-    <div>
+    <div class="p-5">
       <DatePicker is-expanded v-model="datePick"
         :attributes="attributes"/>
     </div>
@@ -34,10 +34,10 @@
                 <div>
                   <span>種類: </span>
                   <select class="w-75 my-2" v-model="incomeRecords.category">
-                    <option value="salary">工資</option>
-                    <option value="bonus">獎金</option>
-                    <option value="investment">理財投資</option>
-                    <option value="partTime">兼職</option>
+                    <option value="工資">工資</option>
+                    <option value="獎金">獎金</option>
+                    <option value="理財投資">理財投資</option>
+                    <option value="兼職">兼職</option>
                   </select>
                 </div>
                 <div>
@@ -68,10 +68,19 @@
               <div>
                 <span>種類: </span>
                 <select class="w-75 my-2" v-model="payRecords.category">
-                  <option value="salary">工資</option>
-                  <option value="bonus">獎金</option>
-                  <option value="investment">理財投資</option>
-                  <option value="partTime">兼職</option>
+                  <option value="飲食">飲食</option>
+                  <option value="日用">日用</option>
+                  <option value="交通">交通</option>
+                  <option value="社交">社交</option>
+                  <option value="娛樂">娛樂</option>
+                  <option value="美容">美容</option>
+                  <option value="醫療">醫療</option>
+                  <option value="教育">教育</option>
+                  <option value="寵物">寵物</option>
+                  <option value="旅行">旅行</option>
+                  <option value="住屋">住屋</option>
+                  <option value="通訊">通訊</option>
+                  <option value="服飾">服飾</option>
                 </select>
               </div>
               <div>
@@ -99,7 +108,6 @@
             <th scope="col">時間</th>
             <th scope="col">分類</th>
             <th scope="col">金額</th>
-            <!-- <th colspan="2">備註</th> -->
             <th scope="col">備註</th>
           </tr>
         </thead>
@@ -135,17 +143,16 @@ export default{
         }
       ]);
     const selectedDate = ref('')
-    const datePick = ref(new Date());
+    const datePick = ref(new Date(+new Date() + 8 * 3600 * 1000));
     const toDay = new Date(+new Date() + 8 * 3600 * 1000).toISOString().substr(0,10)
-    // const tempData = ref([]); //
     const startData = ref([]); // 啟動時資料會存在這
     const selectedData = ref([]);
-    const dotShowArr = reactive([]);
-    // 收入
+    // const dotShowArr = reactive([]);
+    // !=============================================收入
     const incomeRecords = reactive({
       id: Date.now(),
       date: toDay,
-      category: '',
+      category: '工資',
       money: 0,
       remark: '',
     });
@@ -168,11 +175,11 @@ export default{
         getLocalStorageData();
       }
     }
-    // !------------------------------支出
+    // !======================支出
     const payRecords = reactive({
       id: 0,
       date: toDay,
-      category: '',
+      category: '飲食',
       money: 0,
       remark: '',
     });
@@ -276,7 +283,6 @@ export default{
       selectedDate,
       attributes,
       dotShow,
-      dotShowArr
     }
   }
 }
