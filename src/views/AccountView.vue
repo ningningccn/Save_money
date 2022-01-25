@@ -4,6 +4,7 @@
       <div class="head-l w-25 text-start mt-2">
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
         <div class="date">{{ toDay }}</div>
+        <div>總數：{{ startData.length }}</div>
       </div>
       <div class="head-r w-50 text-end">
         <div>總收入 : <span class="text-success">${{ income }}</span></div>
@@ -28,7 +29,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form @submit.prevent="addIncome">
+              <form @submit="addIncome">
                 <span>日期: </span><input type="date" class="w-75 my-2" v-model="incomeRecords.date">
                 <div>
                   <span>種類: </span>
@@ -134,12 +135,11 @@ export default{
         }
       ]);
     const selectedDate = ref('')
-    const datePick = ref(new Date(+new Date() + 8 * 3600 * 1000));
-    // const toDay = new Date().toISOString().slice(0,10)
+    const datePick = ref(new Date());
     const toDay = new Date(+new Date() + 8 * 3600 * 1000).toISOString().substr(0,10)
     // const tempData = ref([]); //
     const startData = ref([]); // 啟動時資料會存在這
-    const moneyDataShow = ref([]);
+    const selectedData = ref([]);
     const dotShowArr = reactive([]);
     // 收入
     const incomeRecords = reactive({
@@ -189,8 +189,6 @@ export default{
         const tempArr = JSON.parse(localStorage.getItem('data'));
         tempArr.push(payRecords);
         localStorage.setItem('data', JSON.stringify(tempArr));
-        // console.log(localStorage.getItem('data'));
-        // console.log('2222222')
         getLocalStorageData()
       }
     }
@@ -201,15 +199,17 @@ export default{
       temp.splice(temp.indexOf(item.id),1);
       console.log(temp);
       localStorage.setItem('data', JSON.stringify(temp));
+      console.log(startData.value ,'已經delete')
       getLocalStorageData();
-      console.log(startData.value)
+      console.log(startData.value ,'已經delete2')
     }
     //================================================================
       // 更新畫面
     function getLocalStorageData() {
       console.log(1);
       startData.value = JSON.parse(localStorage.getItem('data'));
-      dotShow(); //顯示紅點
+      console.log('startData update' )
+      // dotShow(); //顯示紅點
     }
     function dotShow() {
       // const tempArr = []
@@ -226,29 +226,26 @@ export default{
     }
     //顯示倒轉
     const dataReverse = computed(() => {
-      if(moneyDataShow.value.length> 0) {
-        return  moneyDataShow.value.slice(0).reverse()
+      if(startData.value.length >0) {
+        if (selectedData.value.length>0){
+          return  selectedData.value.slice(0).reverse()
+        }else if(selectedDate.value != ''){ //沒有pick時，
+          return [];
+        }
       }
-      else if(selectedDate.value){
-        return moneyDataShow.value.slice(0).reverse()
-      }
-      else if(startData.value){
-        return startData.value.filter(item => item.date == toDay)
-      }else {
-        return [];
-      }
+      return startData.value.filter(item => item.date == toDay)
     })
     // const testShowData = computed(() => {
     // })
     watch(datePick,() => {
       if(datePick.value != null){
         selectedDate.value = datePick.value.toISOString().slice(0,10);
-        // console.log(selectedDate.value)
-      }
-      if(startData.value){
-        moneyDataShow.value = startData.value.filter(item => item.date == selectedDate.value)
+        selectedData.value = startData.value.filter(item => item.date == selectedDate.value)
       }
     }),
+    watch(startData,() => {
+      selectedData.value = startData.value.filter(item => item.date == selectedDate.value)
+    })
     onMounted(() => getLocalStorageData())
     onMounted(() => dotShow())
     return {
@@ -259,7 +256,7 @@ export default{
       payRecords,
       addPay,
       startData,
-      moneyDataShow,
+      selectedData,
       getLocalStorageData,
       datePick,
       dataReverse,
