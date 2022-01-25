@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between">
       <div class="head-l w-25 text-start mt-2">
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
-        <div class="date">{{ toDay }}</div>
+        <div>{{ toDay }}</div>
         <div>總數：{{ startData.length }}</div>
       </div>
       <div class="head-r w-50 text-end">
@@ -81,7 +81,7 @@
                 <span>備註: </span><input type="text" class="w-75 my-2" v-model="payRecords.remark">
               </div>
               <div class="d-flex justify-content-end pe-5 py-5">
-                {{ payRecords.money }} {{ payRecords.today}}
+                {{ payRecords.money }}
                 <button type="button" class="btn btn-secondary me-5" data-bs-dismiss="modal">Close</button>
                 <button type="submit" class="btn btn-primary">Save</button>
               </div>
@@ -156,11 +156,13 @@ export default{
       }
       if(!localStorage.getItem('data')){
         const tempArr  = [];
+        incomeRecords.id = Date.now();
         tempArr.push(incomeRecords)
         localStorage.setItem('data', JSON.stringify(tempArr))
         getLocalStorageData()
       }else{
         const tempStr  = JSON.parse(localStorage.getItem('data'));
+        incomeRecords.id = Date.now();
         tempStr.push(incomeRecords);
         localStorage.setItem('data', JSON.stringify(tempStr));
         getLocalStorageData();
@@ -168,7 +170,7 @@ export default{
     }
     // !------------------------------支出
     const payRecords = reactive({
-      id: Date.now(),
+      id: 0,
       date: toDay,
       category: '',
       money: 0,
@@ -181,12 +183,14 @@ export default{
       }
       if(!localStorage.getItem('data')){
         const tempArr = []
+        payRecords.id = Date.now();
         tempArr.push(payRecords);
         console.log('tempData: 158', tempArr);
         localStorage.setItem('data', JSON.stringify(tempArr));
         getLocalStorageData();
       }else{
         const tempArr = JSON.parse(localStorage.getItem('data'));
+        payRecords.id = Date.now();
         tempArr.push(payRecords);
         localStorage.setItem('data', JSON.stringify(tempArr));
         getLocalStorageData()
@@ -195,37 +199,45 @@ export default{
     function deleteData(item) {
       console.log(item.id);
       const temp = JSON.parse(localStorage.getItem('data'));
-      console.log(temp);
-      temp.splice(temp.indexOf(item.id),1);
-      console.log(temp);
-      localStorage.setItem('data', JSON.stringify(temp));
-      console.log(startData.value ,'已經delete')
+      const delId = temp.filter((data)=> data.id !== item.id) // 刪除指定的array
+      localStorage.setItem('data', JSON.stringify(delId));
       getLocalStorageData();
-      console.log(startData.value ,'已經delete2')
     }
     //================================================================
       // 更新畫面
     function getLocalStorageData() {
-      console.log(1);
-      startData.value = JSON.parse(localStorage.getItem('data'));
-      console.log('startData update' )
-      // dotShow(); //顯示紅點
+      if(startData.value === null) {
+        localStorage.setItem('data',JSON.stringify([]))
+      }
+      if(startData.value){
+        startData.value = JSON.parse(localStorage.getItem('data'));
+        console.log('startData update' )
+      }
+      dotShow(); //顯示紅點
     }
     function dotShow() {
-      // const tempArr = []
-      // moneyData.value.forEach((item) => {
-      //   tempArr.includes(item.date)? '' : tempArr.push(item.date)
-      // })
-      // const a = [];
-      // tempArr.forEach((item ) => {
-      //   a.push(item.replace(/-/g,','))
-      // })
-      // a.forEach((item) => {
-      //   attributes[0].dates.push(new Date(item))
-      // })
+      if(attributes[0].dates){
+        attributes[0].dates = [];
+      }
+      if(startData.value !== null) {
+        const tempArr = []
+        startData.value.forEach((item) => {
+          tempArr.includes(item.date)? '' : tempArr.push(item.date)
+        })
+        const a = [];
+        tempArr.forEach((item ) => {
+          a.push(item.replace(/-/g,','))
+        })
+        a.forEach((item) => {
+          attributes[0].dates.push(new Date(item))
+        })
+      }
     }
     //顯示倒轉
     const dataReverse = computed(() => {
+      if(startData.value === null){
+        return;
+      }
       if(startData.value.length >0) {
         if (selectedData.value.length>0){
           return  selectedData.value.slice(0).reverse()
@@ -235,8 +247,6 @@ export default{
       }
       return startData.value.filter(item => item.date == toDay)
     })
-    // const testShowData = computed(() => {
-    // })
     watch(datePick,() => {
       if(datePick.value != null){
         selectedDate.value = datePick.value.toISOString().slice(0,10);
@@ -244,7 +254,9 @@ export default{
       }
     }),
     watch(startData,() => {
-      selectedData.value = startData.value.filter(item => item.date == selectedDate.value)
+      if(startData.value){
+        selectedData.value = startData.value.filter(item => item.date == selectedDate.value)
+      }
     })
     onMounted(() => getLocalStorageData())
     onMounted(() => dotShow())
