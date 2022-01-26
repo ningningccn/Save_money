@@ -2,6 +2,13 @@
   <div class="container border">
     <div class="d-flex justify-content-between">
       <div class="head-l w-25 text-start mt-2">
+        <export-excel
+            :data   = "startData"
+            name= "123.xls">
+            Download Data
+            <img src="download_icon.png"
+            >>
+        </export-excel>
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
         <div>{{ toDay }}</div>
         <div>總數：{{ startData.length }}</div>
