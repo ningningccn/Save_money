@@ -189,13 +189,11 @@
 <script>
 import { ref, reactive, onMounted, computed, watch } from "vue";
 import { DatePicker } from "v-calendar";
+import {useStore} from "vuex"
 export default {
   components: { DatePicker },
   setup() {
-    // 總數
-    // const incomeValue = ref(0);
-    // const payValue = ref(0);
-    // const balances = ref(0);
+    const store = useStore();
     const attributes = reactive([
       {
         dot: "red",
@@ -203,7 +201,7 @@ export default {
       },
     ]);
     const selectedDate = ref("");
-    const datePick = ref(new Date());
+    const datePick = ref(new Date(+new Date() + 8 * 3600 * 1000).toISOString().substr(0, 10));
     const toDay = new Date(+new Date() + 8 * 3600 * 1000).toISOString().substr(0, 10);
     const startData = ref([]); // 啟動時資料會存在這
     const selectedData = ref([]);
@@ -323,6 +321,7 @@ export default {
         });
       }
     }
+    // const toDay = computed(() => store.getters.toDay)
     //顯示倒轉
     const dataReverse = computed(() => {
       if (startData.value === null) {
@@ -346,7 +345,7 @@ export default {
         );
       }
     }),
-      watch(startData, () => {
+    watch(startData, () => {
         if (startData.value) {
           selectedData.value = startData.value.filter(
             (item) => item.date == selectedDate.value
@@ -356,10 +355,9 @@ export default {
     onMounted(() => getLocalStorageData());
     onMounted(() => dotShow());
     return {
-      // payValue,
+      store,
       pay,
       income,
-      // incomeValue,
       balances,
       toDay,
       incomeRecords,
