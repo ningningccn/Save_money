@@ -7,20 +7,20 @@
     </div>
     <!-- chart table -->
     <div class="col-8 mx-auto">
-    <table class="table">
-      <thead>
-        <tr v-if="ShowReportContext.payReport.length>0">
-          <th scope="col">{{ ShowReportContext.payReport[0][0] }}</th>
-          <th scope="col">{{ ShowReportContext.payReport[0][1] }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item ,index) in ShowReportContext.payReport" :key="item">
-          <td v-if="index >=1"> {{item[0]}}</td>
-          <td v-if="index >=1"> ${{item[1]}}</td>
-        </tr>
-      </tbody>
-    </table>
+      <table class="table">
+        <thead>
+          <tr v-if="ShowReportContext.payReport.length>0">
+            <th scope="col">{{ ShowReportContext.payReport[0][0] }}</th>
+            <th scope="col">{{ ShowReportContext.payReport[0][1] }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item ,index) in ShowReportContext.payReport" :key="item">
+            <td v-if="index >=1"> {{item[0]}}</td>
+            <td v-if="index >=1"> ${{item[1]}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
   <div v-else>沒有資料顯示{{ ShowReportContext.showReportDate }}的支出</div>
@@ -33,7 +33,7 @@
   <h3 v-if="ShowReportContext.showReportDate.length == 10">
     {{ShowReportContext.showReportDate }}
   </h3>
-  <div v-if="ShowReportContext.payReport.length >=2">
+  <div v-if="ShowReportContext.incomeReport.length >=2">
     <div>
       <GChart type="ColumnChart" :data="ShowReportContext.incomeReport" :options="chartOptions" />
     </div>

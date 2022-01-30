@@ -11,7 +11,7 @@
         </export-excel>
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
         <div>{{ toDay }}</div>
-        <div>總數：{{ startData.length }}</div>
+        <!-- <div>總數：{{ startData.length }}</div> -->
       </div>
       <div class="head-r w-50 text-end">
         <div>
@@ -294,7 +294,7 @@ export default {
     //================================================================
     // 更新畫面
     function getLocalStorageData() {
-      if (startData.value === null) {
+      if (localStorage.getItem('data') === null) {
         localStorage.setItem("data", JSON.stringify([]));
       }
       if (startData.value) {
