@@ -6,8 +6,8 @@
             :data   = "startData"
             name= "123.xls">
             Download Data
-            <img src="download_icon.png"
-            >>
+            <!-- <img src="download_icon.png"> -->
+            >
         </export-excel>
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
         <div>{{ toDay }}</div>
