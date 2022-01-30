@@ -13,9 +13,9 @@
       </template>
     </DatePicker>
     <div>
-      <button @click="getReportData(1)">顯示年份</button>
-      <button @click="getReportData(2)">顯示日期</button>
-      <button @click="getReportData(3)">顯示</button>
+      <button @click="getReportData(1)">年</button>
+      <button @click="getReportData(2)">月</button>
+      <button @click="getReportData(3)">日</button>
     </div>
     <div class="col-9 mx-auto">
       <BarChart />
@@ -36,8 +36,9 @@ export default {
   setup() {
     const store = useStore();
     onMounted(() => store.dispatch("getLocalStorageData"));
+    onMounted(() => getReportData(2))
     // const dickPick = ref(new Date())
-    const toDay = ref(new Date(+new Date() + 8 * 3600 * 1000));
+    const toDay = ref(new Date());
     // const masks = {input: 'YYYY-MM-DD'}
     function seletedReportDate() {
       // console.log(toDay)

@@ -96,6 +96,15 @@ export default createStore({
         incomeCount = 0;
       })
       let payList = context.state.startData.filter(item => item.type === "pay")
+      if(num === 1) {
+        payList = payList.filter(item => item.date.slice(0,4) === showReportDate)
+      }
+      if(num === 2) {
+        payList = payList.filter(item => item.date.slice(0,7) === showReportDate)
+      }
+      if(num === 3) {
+        payList = payList.filter(item => item.date.slice(0,10) === showReportDate)
+      }
       let payCount = 0;
       let payOnlyList = new Set();
       payList.forEach(item => {
