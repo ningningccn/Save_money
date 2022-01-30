@@ -34,6 +34,7 @@ export default createStore({
   },
   actions: {
     getLocalStorageData(context) {
+      console.log(123)
       if (this.state.startData.value === null) {
         context.commit('STARTDATA',localStorage.setItem("data", JSON.stringify([])))
       }
