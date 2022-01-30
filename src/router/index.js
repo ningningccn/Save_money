@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Account from '../views/AccountView.vue'
 const routes = [
   {
-    path: '/account',
+    path: '/',
     name: 'account',
     component: Account,
     // route level code-splitting
@@ -10,11 +10,11 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     // component: () => import(/* webpackChunkName: "about" */ '../views/AccountView.vue')
   },
-  {
-    path: '/allData',
-    name: 'allData',
-    component: () => import(/* webpackChunkName: "about" */ '../views/AllDataView.vue')
-  },
+  // {
+  //   path: '/allData',
+  //   name: 'allData',
+  //   component: () => import(/* webpackChunkName: "about" */ '../views/AllDataView.vue')
+  // },
   {
     path: '/report',
     name: 'report',
