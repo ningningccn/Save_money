@@ -1,38 +1,42 @@
 <template>
-  <div class="container border">
+  <div class="container col-md-8">
     <div class="d-flex justify-content-between">
       <div class="head-l w-25 text-start mt-2">
-        <export-excel
+        <!-- <export-excel
             :data   = "startData"
             name= "123.xls">
             Download Data
-            <!-- <img src="download_icon.png"> -->
+            <img src="download_icon.png">
             >
-        </export-excel>
+        </export-excel> -->
         <div class="title"><i class="bi bi-coin"></i> 帳目明細</div>
         <div>{{ toDay }}</div>
-        <!-- <div>總數：{{ startData.length }}</div> -->
       </div>
-      <div class="head-r w-50 text-end">
-        <div>
-          總收入 : <span class="text-success">${{ income }}</span>
+      <div class="text-end fw-bolder d-flex flex-column header-right text-blue p-2">
+        <div class="d-flex justify-content-end border-bottom-blue">
+          <div>
+            <div>總收入 :</div>
+            <div>總支出 :</div>
+          </div>
+          <div>
+            <div class="text-green">+ ${{ income }}</div>
+            <div  class="text-red">- ${{ pay }}</div>
+          </div>
         </div>
-        <div>
-          總支出 : <span class="text-danger">${{ pay }}</span>
-        </div>
-        <div>
-          餘額 : <span>${{ balances }}</span>
+        <div class="d-flex justify-content-end">
+            <div>餘額 : </div>
+            <div>${{ balances }}</div>
         </div>
       </div>
     </div>
-    <div class="p-5">
-      <DatePicker is-expanded v-model="datePick" :attributes="attributes" />
+    <div class="px-5 py-3 ">
+      <DatePicker is-expanded v-model="datePick" :attributes="attributes" :theme-styles='themeStyles'></DatePicker>
     </div>
     <div class="d-flex justify-content-around">
-      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#incomeModal">
+      <button type="button" class="btn btn-success fw-bolder" data-bs-toggle="modal" data-bs-target="#incomeModal">
         收入
       </button>
-      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#payModal">
+      <button type="button" class="btn btn-danger fw-bolder" data-bs-toggle="modal" data-bs-target="#payModal">
         支出
       </button>
 
@@ -149,38 +153,42 @@
     </div>
 
     <!-- table -->
-    <div class="border mt-3">
-      <table class="table table-hover">
-        <thead>
+    <div class="border-radius mt-3">
+      <table class="table fw-bolder table-striped p-5"
+        v-if="dataReverse.length>0">
+        <thead class="text-blue">
           <tr>
-            <th scope="col">時間</th>
-            <th scope="col">時間</th>
+            <th scope="col">日期</th>
             <th scope="col">分類</th>
             <th scope="col">金額</th>
             <th scope="col">備註</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="text-blue">
           <tr v-for="item in dataReverse" :key="item.id">
-            <td class="col-1">
-              <span v-if="item.type=='income'" class="text-success">⇧</span>
-              <span v-else class="text-danger">⇩</span>
+            <td class="col-5 col-md-3">
+              <span v-if="item.type=='income'" class="text-green">
+                <i class="bi bi-arrow-up"></i>
+              </span>
+              <span v-else class="text-red">
+                <i class="bi bi-arrow-down"></i>
+              </span>
+              {{ item.date }}
             </td>
-            <td class="col-3">{{ item.date }}</td>
-            <td class="col-2">{{ item.category }}</td>
-            <td class="col-2">{{ item.money }}</td>
-            <td class="col-3">{{ item.remark }}</td>
+            <td class="col-2 col-md-3">{{ item.category }}</td>
+            <td class="col-2 col-md-3">${{ item.money }}</td>
+            <td class="col-3 col-md-3">{{ item.remark }}</td>
             <td class="col-1">
               <button
                 type="button"
-                class="btn-close"
+                class="btn-close text-blue"
                 @click="deleteData(item)"
               ></button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div class="text-center p-5" v-if="!startData || startData == undefined">
+      <div class="text-center p-5 text-blue fw-bolder" v-if="dataReverse.length == 0">
         沒有資料
       </div>
     </div>
@@ -189,7 +197,7 @@
 <script>
 import { ref, reactive, onMounted, computed, watch } from "vue";
 import { DatePicker } from "v-calendar";
-import {useStore} from "vuex"
+import { useStore } from "vuex"
 export default {
   components: { DatePicker },
   setup() {
@@ -199,6 +207,10 @@ export default {
         dot: "red",
         dates: [], // dates:[new Date(2022, 0, 10),new Date(2022, 0, 15),new Date(2022, 0, 20)]
       },
+      {
+        dot: "green",
+        dates: [],
+      }
     ]);
     const selectedDate = ref("");
     const datePick = ref(new Date(+new Date() + 8 * 3600 * 1000).toISOString().substr(0, 10));
@@ -308,20 +320,33 @@ export default {
         attributes[0].dates = [];
       }
       if (startData.value !== null) {
-        const tempArr = [];
-        startData.value.forEach((item) => {
-          tempArr.includes(item.date) ? "" : tempArr.push(item.date);
+        const income = [];
+        const incomeTempArr = [];
+        const incomeDotArr = startData.value.filter(item => item.type === "income");
+        incomeDotArr.forEach((item) => {
+          incomeTempArr.includes(item.date) ? "" : incomeTempArr.push(item.date);
         });
-        const a = [];
-        tempArr.forEach((item) => {
-          a.push(item.replace(/-/g, ","));
+        incomeTempArr.forEach((item) => {
+          income.push(item.replace(/-/g, ","));
         });
-        a.forEach((item) => {
+        income.forEach((item) => {
+          attributes[1].dates.push(new Date(item));
+        });
+
+        const pay = [];
+        const payTempArr = [];
+        const payDotArr = startData.value.filter(item => item.type === "pay");
+        payDotArr.forEach((item) => {
+          payTempArr.includes(item.date) ? "" : payTempArr.push(item.date);
+        });
+        payTempArr.forEach((item) => {
+          pay.push(item.replace(/-/g, ","));
+        });
+        pay.forEach((item) => {
           attributes[0].dates.push(new Date(item));
         });
       }
     }
-    // const toDay = computed(() => store.getters.toDay)
     //顯示倒轉
     const dataReverse = computed(() => {
       if (startData.value === null) {
@@ -379,4 +404,40 @@ export default {
 </script>
 
 <style>
+.btn-success{
+  color: #fff !important;;
+  border-color: #81BE63 !important;
+  background-color:#81BE63 !important;
+}
+.btn-danger{
+  color: #fff !important;
+  border-color: #ED6D70 !important;
+  background-color:#ED6D70 !important;
+}
+.text-green{
+  color: #81BE63;
+}
+.text-red{
+  color: #ED6D70;
+}
+.text-blue{
+  color: #5C8EAD
+}
+.table{
+  /* border-bottom-color: #5C8EAD !important */
+  --bs-table-striped-color: #5C8EAD !important;
+  --bs-table-striped-bg: #D0EBFA !important;
+}
+.border-radius{
+  border: 2px solid #5C8EAD;
+  border-radius: 20px;
+}
+
+.border-bottom-blue{
+  border-bottom: 2px solid #5C8EAD;
+}
+.header-right{
+  border-radius: 10px;
+  border: 2px solid #5C8EAD;
+}
 </style>

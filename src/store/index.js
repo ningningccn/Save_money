@@ -43,7 +43,8 @@ export default createStore({
       }
     },
     seletedReportDate(context, val){
-      console.log(val)
+      // console.log(val)
+      val = new Date(+val + 8 *3600 *1000).toISOString().slice(0,10)
       const date = {
         year: val.slice(0,4),
         month: val.slice(5,7),
@@ -58,7 +59,6 @@ export default createStore({
         payReport: [],
       }
       let incomeList = context.state.startData.filter(item => item.type === "income"); //將income type分類
-      // console.log('incomeList: ', incomeList);
       let showReportDate = "";
       if(num === 1 ){
         showReportDate= context.state.seletedReportDate.year;

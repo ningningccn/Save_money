@@ -3,7 +3,7 @@
   <div v-if="ShowReportContext.payReport.length >=2">
     <!-- chart -->
     <div>
-      <GChart type="ColumnChart" :data="ShowReportContext.payReport" :options="chartOptions" />
+      <GChart type="PieChart" :data="ShowReportContext.payReport" :options="chartOptions" />
     </div>
     <!-- chart table -->
     <div class="col-8 mx-auto">
@@ -68,19 +68,12 @@ export default {
   },
   setup(){
     const store = useStore();
-    // const chartData = reactive(
-    //   [
-    //     ["Year", "Sales"],
-    //     ["2014", 1000],
-    //     ["2015", 1170],
-    //     ["2016", 660],
-    //     ["2017", 1030],
-    //   ],
-    // )
+
     const chartOptions = reactive({
       chart: {
         title: "Company Performance",
-        subtitle: "Sales, Expenses, and Profit: 2014-2017",
+        // subtitle: "Sales, Expenses, and Profit: 2014-2017",
+        is3D: true,
       }
     })
     const ShowReportContext = computed(() => store.getters.ShowReportContext);

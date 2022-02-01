@@ -3,7 +3,7 @@
     <div>
       {{ toDay }}
     </div>
-    <DatePicker v-model="toDay ">
+    <DatePicker v-model="toDay">
       <template #default="{ inputValue, inputEvents }">
         <input
           class="px-3 py-1 border rounded"
@@ -41,8 +41,10 @@ export default {
     const toDay = ref(new Date());
     // const masks = {input: 'YYYY-MM-DD'}
     function seletedReportDate() {
-      // console.log(toDay)
-      store.dispatch("seletedReportDate", toDay.value.toISOString().slice(0, 10));
+      console.log(toDay)
+      console.log(toDay.value.toISOString().slice(0, 10))
+      // store.dispatch("seletedReportDate", toDay.value.toISOString().slice(0, 10));
+      store.dispatch("seletedReportDate", toDay.value);
     }
     function getReportData(num) {
       seletedReportDate();
