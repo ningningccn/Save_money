@@ -41,10 +41,10 @@
       </button>
 
       <!-- Modal Income-->
-      <div class="modal fade" id="incomeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade text-blue bolder" id="incomeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header ">
               <h5 class="modal-title" id="exampleModalLabel">收入</h5>
               <button
                 type="button"
@@ -56,7 +56,7 @@
             <div class="modal-body">
               <form @submit="addIncome">
                 <span>日期: </span>
-                <input type="date" class="w-75 my-2" v-model="incomeRecords.date"/>
+                <input type="date" class="w-75 my-2 " v-model="incomeRecords.date"/>
                 <div>
                   <span>種類: </span>
                   <select class="w-75 my-2" v-model="incomeRecords.category">
@@ -78,7 +78,7 @@
                   <span>備註: </span
                   ><input
                     type="text"
-                    class="w-75 my-2"
+                    class="w-75 my-2 text-blue fw-bolder"
                     v-model="incomeRecords.remark"
                   />
                 </div>
@@ -99,7 +99,7 @@
       </div>
       <!-- Modal pay -->
       <div
-        class="modal fade"
+        class="modal fade text-blue fw-bolder"
         id="payModal"
         tabindex="-1"
         aria-labelledby="exampleModalLabel"
@@ -439,5 +439,13 @@ export default {
 .header-right{
   border-radius: 10px;
   border: 2px solid #5C8EAD;
+}
+
+form input,select {
+  border: 2px solid #5C8EAD;
+  border-radius: 10px;
+  padding: 10px;
+  color: #5C8EAD;
+  font-weight: bolder;
 }
 </style>

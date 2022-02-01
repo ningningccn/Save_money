@@ -1,9 +1,6 @@
 <template>
   <nav>
     <ul class="nav nav-tabs justify-content-center">
-      <!-- <li class="nav-item">
-        <router-link class="nav-link" :class="{'active':visibility == 'allData'}" @click="visibility = 'allData'" to="/allData">總覽</router-link>
-      </li> -->
       <li class="nav-item">
         <router-link class="nav-link" :class="{'active':visibility == 'account'}" @click="visibility = 'account'" to="/">記帳</router-link>
       </li>
@@ -38,9 +35,10 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  
 }
-
+/* .nav-tabs .nav-link {
+  border: 1px solid #5C8EAD;
+} */
 
 /* nav {
   padding: 30px;
